@@ -1,0 +1,42 @@
+<?php
+require 'config.php';
+require 'entete.php';
+
+$terme = $_GET['q'] ?? '';
+$livres = [];
+
+if ($terme) {
+    $stmt = $pdo->prepare("SELECT * FROM livre WHERE titre LIKE ?");
+    $stmt->execute(['%' . $terme . '%']);
+    $livres = $stmt->fetchAll();
+}
+?>
+
+<h1>Recherche</h1>
+
+<form method="get" action="recherche.php" class="mb-4">
+    <input type="text" name="q" class="form-control" placeholder="Rechercher un livre..." value="<?php echo htmlspecialchars($terme); ?>" />
+</form>
+
+<?php if ($terme && empty($livres)): ?>
+    <p>Aucun livre trouvé pour "<?php echo htmlspecialchars($terme); ?>"</p>
+<?php endif; ?>
+
+<div class="row">
+<?php foreach ($livres as $livre): ?>
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <?php if (!empty($livre['photo'])): ?>
+                <img src="covers/<?php echo htmlspecialchars($livre['photo']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($livre['titre']); ?>">
+            <?php endif; ?>
+            <div class="card-body">
+                <h5 class="card-title"><?php echo htmlspecialchars($livre['titre']); ?></h5>
+                <a href="livre.php?nolivre=<?php echo $livre['nolivre']; ?>" class="btn btn-primary">Voir détails</a>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
+</div>
+
+<?php
+require 'footer.php';
