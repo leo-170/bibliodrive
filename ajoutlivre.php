@@ -2,7 +2,7 @@
 session_start();
 require "config.php";
 
-// Vérifier que l'utilisateur est connecté ET admin
+
 if (!isset($_SESSION['profil']) || $_SESSION['profil'] !== 'admin') {
     header("Location: page_accueil.php?msg=acces_interdit");
     exit;
@@ -10,7 +10,7 @@ if (!isset($_SESSION['profil']) || $_SESSION['profil'] !== 'admin') {
 
 $erreurs = [];
 
-// Récupérer les auteurs pour le select
+
 $stmtAuteurs = $pdo->query("SELECT * FROM auteur ORDER BY nom, prenom");
 $auteurs = $stmtAuteurs->fetchAll(PDO::FETCH_ASSOC);
 
@@ -18,13 +18,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titre = trim($_POST['titre'] ?? '');
     $noauteur = intval($_POST['auteur'] ?? 0);
 
-    // Vérification champs obligatoires
     if ($titre === '') $erreurs[] = "Le titre est obligatoire.";
     if ($noauteur <= 0) $erreurs[] = "Vous devez choisir un auteur.";
 
-    // Si pas d'erreurs, on enregistre
     if (empty($erreurs)) {
-        // Comme la photo n'est plus utilisée, on met NULL ou '' dans la base
+        
         $stmt = $pdo->prepare("
             INSERT INTO livre (titre, noauteur, photo, dateajout)
             VALUES (:titre, :noauteur, NULL, CURDATE())

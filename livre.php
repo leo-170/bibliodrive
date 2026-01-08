@@ -14,7 +14,7 @@ $stmt->execute(['nolivre'=>$nolivre]);
 $livre = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$livre) die("Livre introuvable !");
 
-// Vérifie disponibilité
+// Verifie disponibilite
 $stmt = $pdo->prepare("SELECT * FROM emprunter WHERE nolivre = :nolivre AND dateretour IS NULL LIMIT 1");
 $stmt->execute(['nolivre'=>$nolivre]);
 $emprunt = $stmt->fetch(PDO::FETCH_ASSOC);

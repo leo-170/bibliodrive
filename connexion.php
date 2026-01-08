@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once "config.php"; // contient $pdo
+require_once "config.php"; 
 
 $erreur = "";
 
-// Déconnexion
+
 if (isset($_GET['deco'])) {
     session_unset();
     session_destroy();
@@ -12,20 +12,20 @@ if (isset($_GET['deco'])) {
     exit;
 }
 
-// Traitement connexion
+
 if (isset($_POST['btnconnexion'])) {
 
     $mel = $_POST['mel'] ?? '';
     $motdepasse = $_POST['motdepasse'] ?? '';
 
-    // Requête préparée
+    
     $stmt = $pdo->prepare(
         "SELECT * FROM utilisateur WHERE mel = :mel"
     );
     $stmt->execute(['mel' => $mel]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Vérification mot de passe
+    
     if ($user && password_verify($motdepasse, $user['motdepasse'])) {
 
         $_SESSION['mel'] = $user['mel'];

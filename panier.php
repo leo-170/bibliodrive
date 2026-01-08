@@ -2,7 +2,7 @@
 session_start();
 $pdo = new PDO("mysql:host=localhost;dbname=projet;charset=utf8", "root", "");
 
-// Vérifier si connecté
+// Verifier si connecte
 if (!isset($_SESSION["mel"])) {
     echo "<p>Connectez-vous pour voir votre panier.</p>";
     exit;
@@ -19,7 +19,7 @@ if (isset($_GET['ajouter'])) {
 
     if (!in_array($nolivre, $_SESSION["panier"])) {
 
-        // Vérifier si pas déjà emprunté par ce membre
+        // Verifier si pas deja emprunte par ce membre
         $stmtCheck = $pdo->prepare("
             SELECT * FROM emprunter 
             WHERE nolivre = :nolivre 
@@ -51,7 +51,7 @@ if (isset($_GET['supprimer'])) {
 // --- VALIDATION PANIER ---
 if (isset($_POST['valider'])) {
 
-    // 1) compter les emprunts déjà en cours
+    // 1) compter les emprunts deja en cours
     $stmtCount = $pdo->prepare("
         SELECT COUNT(*) FROM emprunter 
         WHERE mel = :mel AND dateretour IS NULL
@@ -66,7 +66,7 @@ if (isset($_POST['valider'])) {
         echo "<p class='text-danger'>Vous ne pouvez pas emprunter plus de 5 livres en même temps.</p>";
     } else {
         foreach ($_SESSION["panier"] as $nolivre) {
-            // Vérifier si déjà emprunté par ce membre
+            // Verifier si deja emprunte par ce membre
             $stmt_exist = $pdo->prepare("
                 SELECT * FROM emprunter
                 WHERE mel = :mel AND nolivre = :nolivre AND dateretour IS NULL
@@ -91,7 +91,7 @@ if (isset($_POST['valider'])) {
         // Vider panier
         $_SESSION["panier"] = [];
 
-        // REDIRECTION vers la page principale après validation
+        // REDIRECTION vers la page principale apres validation
         header("Location: page_accueil.php?msg=panier_valide");
         exit;
     }

@@ -2,7 +2,7 @@
 session_start();
 require "config.php";
 
-// Vérifier si admin
+
 if (!isset($_SESSION['profil']) || $_SESSION['profil'] !== 'admin') {
     header("Location: page_accueil.php?msg=acces_interdit");
     exit;
@@ -10,29 +10,27 @@ if (!isset($_SESSION['profil']) || $_SESSION['profil'] !== 'admin') {
 
 $erreurs = [];
 
-// Traitement formulaire
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom = trim($_POST['nom'] ?? '');
     $prenom = trim($_POST['prenom'] ?? '');
     $mel = trim($_POST['mel'] ?? '');
     $motdepasse = $_POST['motdepasse'] ?? '';
-    $profil = $_POST['profil'] ?? 'membre'; // par défaut
+    $profil = $_POST['profil'] ?? 'membre'; 
 
-    // Vérifications
+    
     if ($nom === '') $erreurs[] = "Le nom est obligatoire.";
     if ($prenom === '') $erreurs[] = "Le prénom est obligatoire.";
     if ($mel === '') $erreurs[] = "L'email est obligatoire.";
     if (!filter_var($mel, FILTER_VALIDATE_EMAIL)) $erreurs[] = "Email invalide.";
     if ($motdepasse === '') $erreurs[] = "Le mot de passe est obligatoire.";
 
-    // Vérifier que l'email n'existe pas déjà
     $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE mel = ?");
     $stmt->execute([$mel]);
     if ($stmt->rowCount() > 0) {
         $erreurs[] = "Cet email est déjà utilisé.";
     }
 
-    // Si pas d'erreurs, on insère
     if (empty($erreurs)) {
         $hash = password_hash($motdepasse, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("
