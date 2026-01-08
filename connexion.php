@@ -1,41 +1,46 @@
 <?php
 session_start();
-ob_start();
+require_once "config.php"; // contient $pdo
 
-$deco = $_GET['deco'] ?? null;
-if ($deco == 1) {
+$erreur = "";
+
+// Déconnexion
+if (isset($_GET['deco'])) {
     session_unset();
     session_destroy();
     header("Location: page_accueil.php");
-    exit();
+    exit;
 }
 
-// Vérification si utilisateur est déjà connecté
-if (isset($_SESSION["mel"])) {
-    $utilisateurConnecte = true;
-} else {
-    $utilisateurConnecte = false;
-}
+// Traitement connexion
+if (isset($_POST['btnconnexion'])) {
 
-// Si formulaire soumis
-if (!$utilisateurConnecte && isset($_POST['btnconnexion'])) {
-    $mel = $_POST['mel'];
-    $motdepasse = $_POST['motdepasse'];
+    $mel = $_POST['mel'] ?? '';
+    $motdepasse = $_POST['motdepasse'] ?? '';
 
-    // Hardcodé pour test
-    if ($mel === "louis.martin@rabelais.com" && $motdepasse === "SECRET") {
-        $_SESSION["mel"] = $mel;
-        $_SESSION["prenom"] = "Louis";
-        $_SESSION["nom"] = "Martin";
-        $_SESSION["adresse"] = "1 Rue Exemple";
-        $_SESSION["codepostal"] = "37000";
-        $_SESSION["ville"] = "Tours";
-        $_SESSION["profil"] = "client";
+    // Requête préparée
+    $stmt = $pdo->prepare(
+        "SELECT * FROM utilisateur WHERE mel = :mel"
+    );
+    $stmt->execute(['mel' => $mel]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Vérification mot de passe
+    if ($user && password_verify($motdepasse, $user['motdepasse'])) {
+
+        $_SESSION['mel'] = $user['mel'];
+        $_SESSION['nom'] = $user['nom'];
+        $_SESSION['prenom'] = $user['prenom'];
+        $_SESSION['adresse'] = $user['adresse'];
+        $_SESSION['ville'] = $user['ville'];
+        $_SESSION['codepostal'] = $user['codepostal'];
+        $_SESSION['profil'] = $user['profil'];
 
         header("Location: page_accueil.php");
-        exit();
+        exit;
+
     } else {
-        $erreur = "Échec de la connexion. Veuillez réessayer.";
+        $erreur = "Identifiants incorrects";
     }
 }
 ?>
@@ -48,42 +53,54 @@ if (!$utilisateurConnecte && isset($_POST['btnconnexion'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <?php if ($utilisateurConnecte): ?>
+        <div class="col-md-5">
+
+            <?php if (isset($_SESSION['mel'])): ?>
+
                 <div class="card shadow text-center">
                     <div class="card-body">
-                        <h3>Vous êtes connecté</h3>
-                        <p><?= htmlspecialchars($_SESSION["prenom"] . " " . $_SESSION["nom"]) ?></p>
+                        <h4>Connecté</h4>
+                        <p><?= htmlspecialchars($_SESSION['prenom'].' '.$_SESSION['nom']) ?></p>
                         <a href="connexion.php?deco=1" class="btn btn-danger">Déconnexion</a>
                     </div>
                 </div>
+
             <?php else: ?>
+
                 <div class="card shadow">
                     <div class="card-body">
-                        <h3 class="card-title text-center mb-4">Connexion</h3>
-                        <?php if (!empty($erreur)) echo '<div class="alert alert-danger">'.$erreur.'</div>'; ?>
+                        <h4 class="text-center mb-3">Connexion</h4>
+
+                        <?php if ($erreur): ?>
+                            <div class="alert alert-danger"><?= $erreur ?></div>
+                        <?php endif; ?>
+
                         <form method="post">
                             <div class="mb-3">
-                                <label for="mel" class="form-label">Votre mail :</label>
-                                <input name="mel" id="mel" class="form-control" type="email" required>
+                                <label class="form-label">Email</label>
+                                <input type="email" name="mel" class="form-control" required>
                             </div>
+
                             <div class="mb-3">
-                                <label for="motdepasse" class="form-label">Votre mot de passe :</label>
-                                <input name="motdepasse" id="motdepasse" class="form-control" type="password" required>
+                                <label class="form-label">Mot de passe</label>
+                                <input type="password" name="motdepasse" class="form-control" required>
                             </div>
-                            <div class="text-center">
-                                <button type="submit" name="btnconnexion" class="btn btn-success w-100">Connexion</button>
-                            </div>
+
+                            <button type="submit" name="btnconnexion" class="btn btn-success w-100">
+                                Connexion
+                            </button>
                         </form>
                     </div>
                 </div>
+
             <?php endif; ?>
+
         </div>
     </div>
 </div>
+
 </body>
 </html>
-
-<?php ob_end_flush(); ?>

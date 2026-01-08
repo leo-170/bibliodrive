@@ -6,10 +6,17 @@ $terme = $_GET['q'] ?? '';
 $livres = [];
 
 if ($terme) {
-    $stmt = $pdo->prepare("SELECT * FROM livre WHERE titre LIKE ?");
-    $stmt->execute(['%' . $terme . '%']);
+    $stmt = $pdo->prepare("
+        SELECT l.*, a.nom, a.prenom
+        FROM livre l
+        JOIN auteur a ON l.noauteur = a.noauteur
+        WHERE a.nom LIKE ? OR a.prenom LIKE ?
+        ORDER BY a.nom, a.prenom, l.titre
+    ");
+    $stmt->execute(['%' . $terme . '%', '%' . $terme . '%']);
     $livres = $stmt->fetchAll();
 }
+
 ?>
 
 <h1>Recherche</h1>

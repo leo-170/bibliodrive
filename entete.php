@@ -20,33 +20,52 @@ if (session_status() === PHP_SESSION_NONE) {
 <br>
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="page_accueil.php">Bibliodrive</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="mynavbar">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="page_panier.php">Panier</a>
-          </li>
-        </ul>
+        <a class="navbar-brand" href="page_accueil.php">Bibliodrive</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <!-- Formulaire de recherche -->
-        <form class="d-flex me-3" method="GET" action="recherche.php">
-          <input class="form-control me-2" type="text" name="q" placeholder="Rechercher un auteur">
-          <button class="btn btn-primary" type="submit">Search</button>
-        </form>
+        <div class="collapse navbar-collapse" id="mynavbar">
+            <ul class="navbar-nav me-auto">
 
-        <!-- Bouton Connexion / Déconnexion -->
-        <?php if (isset($_SESSION['mel'])): ?>
-            <a class="btn btn-success" href="connexion.php?deco=1">
-                Déconnexion (<?= htmlspecialchars($_SESSION['prenom']) ?>)
-            </a>
-        <?php else: ?>
-            <a class="btn btn-warning" href="connexion.php">
-                Connexion
-            </a>
-        <?php endif; ?>
-      </div>
+                <?php
+                $nbPanier = 0;
+                if (isset($_SESSION['panier']) && is_array($_SESSION['panier'])) {
+                    $nbPanier = count($_SESSION['panier']);
+                }
+                ?>
+
+                <?php if (isset($_SESSION['mel'])): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="panier.php">
+                            Panier (<?= $nbPanier ?>)
+                        </a>
+                    </li>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['profil']) && $_SESSION['profil'] === 'admin'): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ajoutlivre.php">Ajouter un livre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ajoutmembre.php">Ajouter un membre</a>
+                    </li>
+                <?php endif; ?>
+
+            </ul>
+
+            <form class="d-flex me-3" method="GET" action="recherche.php">
+                <input class="form-control me-2" type="text" name="q" placeholder="Rechercher un auteur">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+
+            <?php if (isset($_SESSION['mel'])): ?>
+                <a class="btn btn-success" href="connexion.php?deco=1">
+                    Déconnexion (<?= htmlspecialchars($_SESSION['prenom']) ?>)
+                </a>
+            <?php else: ?>
+                <a class="btn btn-warning" href="connexion.php">Connexion</a>
+            <?php endif; ?>
+        </div>
     </div>
 </nav>
