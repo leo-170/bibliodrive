@@ -1,25 +1,25 @@
 <?php
-session_start();
-$pdo = new PDO("mysql:host=localhost;dbname=projet;charset=utf8", "root", "");
+session_start(); // demarre session
+$pdo = new PDO("mysql:host=localhost;dbname=projet;charset=utf8", "root", ""); // connexion PDO
 
-// Verifier si connecte
+// verifie si utilisateur connecte
 if (!isset($_SESSION["mel"])) {
     echo "<p>Connectez-vous pour voir votre panier.</p>";
     exit;
 }
 
-// Initialisation panier si inexistant
+// initialisation panier si inexistant
 if (!isset($_SESSION["panier"])) {
     $_SESSION["panier"] = [];
 }
 
 // --- AJOUTER AU PANIER ---
 if (isset($_GET['ajouter'])) {
-    $nolivre = intval($_GET['ajouter']);
+    $nolivre = intval($_GET['ajouter']); // recupere id livre
 
-    if (!in_array($nolivre, $_SESSION["panier"])) {
+    if (!in_array($nolivre, $_SESSION["panier"])) { // si pas deja dans le panier
 
-        // Verifier si pas deja emprunte par ce membre
+        // verifie si livre pas deja emprunte par ce membre
         $stmtCheck = $pdo->prepare("
             SELECT * FROM emprunter 
             WHERE nolivre = :nolivre 
@@ -31,20 +31,20 @@ if (isset($_GET['ajouter'])) {
             'mel'     => $_SESSION["mel"]
         ]);
 
-        if ($stmtCheck->rowCount() == 0) {
-            $_SESSION["panier"][] = $nolivre;
+        if ($stmtCheck->rowCount() == 0) { // si pas encore emprunte
+            $_SESSION["panier"][] = $nolivre; // ajoute au panier
         }
     }
 
-    header("Location: panier.php");
+    header("Location: panier.php"); // redirige pour eviter rechargement
     exit;
 }
 
 // --- SUPPRIMER DU PANIER ---
 if (isset($_GET['supprimer'])) {
-    $nolivre = intval($_GET['supprimer']);
-    $_SESSION["panier"] = array_diff($_SESSION["panier"], [$nolivre]);
-    header("Location: panier.php");
+    $nolivre = intval($_GET['supprimer']); // recupere id livre
+    $_SESSION["panier"] = array_diff($_SESSION["panier"], [$nolivre]); // supprime du panier
+    header("Location: panier.php"); // redirige
     exit;
 }
 
@@ -57,16 +57,16 @@ if (isset($_POST['valider'])) {
         WHERE mel = :mel AND dateretour IS NULL
     ");
     $stmtCount->execute(['mel' => $_SESSION["mel"]]);
-    $empruntsEnCours = $stmtCount->fetchColumn();
+    $empruntsEnCours = $stmtCount->fetchColumn(); // nb emprunts en cours
 
-    $nbPanier = count($_SESSION["panier"]);
+    $nbPanier = count($_SESSION["panier"]); // nb livres dans panier
 
-    // Limite à 5 emprunts
+    // limite a 5 emprunts
     if ($empruntsEnCours + $nbPanier > 5) {
         echo "<p class='text-danger'>Vous ne pouvez pas emprunter plus de 5 livres en même temps.</p>";
     } else {
         foreach ($_SESSION["panier"] as $nolivre) {
-            // Verifier si deja emprunte par ce membre
+            // verifie si deja emprunte par ce membre
             $stmt_exist = $pdo->prepare("
                 SELECT * FROM emprunter
                 WHERE mel = :mel AND nolivre = :nolivre AND dateretour IS NULL
@@ -77,6 +77,7 @@ if (isset($_POST['valider'])) {
             ]);
 
             if ($stmt_exist->rowCount() == 0) {
+                // ajoute emprunt dans la base
                 $stmt2 = $pdo->prepare("
                     INSERT INTO emprunter (mel, nolivre, dateemprunt)
                     VALUES (:mel, :nolivre, CURDATE())
@@ -88,10 +89,10 @@ if (isset($_POST['valider'])) {
             }
         }
 
-        // Vider panier
+        // vider le panier
         $_SESSION["panier"] = [];
 
-        // REDIRECTION vers la page principale apres validation
+        // redirection vers page accueil
         header("Location: page_accueil.php?msg=panier_valide");
         exit;
     }
@@ -110,15 +111,15 @@ if (isset($_POST['valider'])) {
         </tr>
         <?php
         foreach ($_SESSION["panier"] as $nolivre):
-            $stmt = $pdo->prepare("SELECT titre FROM livre WHERE nolivre = :nolivre");
+            $stmt = $pdo->prepare("SELECT titre FROM livre WHERE nolivre = :nolivre"); 
             $stmt->execute(['nolivre' => $nolivre]);
             $livre = $stmt->fetch(PDO::FETCH_ASSOC);
         ?>
         <tr>
-            <td><?= htmlspecialchars($livre['titre']) ?></td>
+            <td><?= htmlspecialchars($livre['titre']) ?></td> 
             <td>
                 <a href="panier.php?supprimer=<?= $nolivre ?>" 
-                   class="btn btn-danger btn-sm">Supprimer</a>
+                   class="btn btn-danger btn-sm">Supprimer</a> 
             </td>
         </tr>
         <?php endforeach; ?>

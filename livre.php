@@ -1,38 +1,41 @@
 <?php
-include "config.php";
-include "entete.php";
+include "config.php"; // inclut config PDO
+include "entete.php"; // inclut header html
 
+// recupere le numero de livre depuis l'url
 $nolivre = isset($_GET['nolivre']) ? intval($_GET['nolivre']) : 0;
-if ($nolivre <= 0) die("Livre introuvable.");
+if ($nolivre <= 0) die("Livre introuvable."); // stop si pas de numero valide
 
-// Infos livre
+// recupere infos du livre et auteur
 $stmt = $pdo->prepare("SELECT livre.*, auteur.nom AS nomAuteur, auteur.prenom AS prenomAuteur
                        FROM livre
                        INNER JOIN auteur ON livre.noauteur = auteur.noauteur
                        WHERE livre.nolivre = :nolivre");
 $stmt->execute(['nolivre'=>$nolivre]);
 $livre = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$livre) die("Livre introuvable !");
+if (!$livre) die("Livre introuvable !"); // stop si livre inexistant
 
-// Verifie disponibilite
+// verifie si le livre est deja emprunte
 $stmt = $pdo->prepare("SELECT * FROM emprunter WHERE nolivre = :nolivre AND dateretour IS NULL LIMIT 1");
 $stmt->execute(['nolivre'=>$nolivre]);
 $emprunt = $stmt->fetch(PDO::FETCH_ASSOC);
-$disponible = ($emprunt === false);
+$disponible = ($emprunt === false); // true si pas d'emprunt actif
 ?>
 
 <div class="container mt-4">
-    <a href="page_accueil.php" class="btn btn-secondary mb-3">← Retour</a>
+    <a href="page_accueil.php" class="btn btn-secondary mb-3">← Retour</a> 
 
     <div class="card shadow">
         <div class="row g-0">
-            <?php if ($livre['photo']): ?>
+            <?php if ($livre['photo']): ?> 
             <div class="col-md-4">
                 <img src="covers/<?= htmlspecialchars($livre['photo']) ?>" class="img-fluid rounded-start">
             </div>
             <?php endif; ?>
             <div class="col-md-8">
                 <div class="card-body">
+
+                    
                     <p>
                         <strong>Disponibilité :</strong>
                         <?php if ($disponible): ?>
@@ -42,6 +45,7 @@ $disponible = ($emprunt === false);
                         <?php endif; ?>
                     </p>
 
+                    
                     <?php if ($disponible && isset($_SESSION['mel'])): ?>
                         <a href="emprunter.php?nolivre=<?= $nolivre ?>" class="btn btn-primary">Emprunter</a>
                     <?php elseif (!$disponible && isset($_SESSION['mel'])): ?>
@@ -50,6 +54,7 @@ $disponible = ($emprunt === false);
                         <p class="text-danger">Connectez-vous pour emprunter ce livre.</p>
                     <?php endif; ?>
 
+                    
                     <h2><?= htmlspecialchars($livre['titre']) ?></h2>
                     <p class="text-muted">
                         Auteur : <strong><?= htmlspecialchars($livre['prenomAuteur'].' '.$livre['nomAuteur']) ?></strong><br>
@@ -58,6 +63,7 @@ $disponible = ($emprunt === false);
                         Date ajout : <strong><?= $livre['dateajout'] ?></strong>
                     </p>
 
+                    
                     <p><?= nl2br(htmlspecialchars($livre['detail'])) ?></p>
                 </div>
             </div>
@@ -65,4 +71,4 @@ $disponible = ($emprunt === false);
     </div>
 </div>
 
-<?php include "footer.php"; ?>
+<?php include "footer.php"; ?> 
