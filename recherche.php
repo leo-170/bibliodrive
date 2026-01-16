@@ -22,7 +22,7 @@ if ($terme) { // si utilisateur a saisi
 
 
 <form method="get" action="recherche.php" class="mb-4">
-    <input type="text" name="q" class="form-control" placeholder="Rechercher un livre..." value="<?php echo htmlspecialchars($terme); ?>" />
+    <input type="text" name="q" class="form-control" placeholder="Rechercher un livre" value="<?php echo htmlspecialchars($terme); ?>" />
 </form>
 
 <?php if ($terme && empty($livres)): ?>

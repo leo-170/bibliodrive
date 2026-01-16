@@ -13,7 +13,7 @@ if (!isset($_SESSION["panier"])) {
     $_SESSION["panier"] = [];
 }
 
-// --- AJOUTER AU PANIER ---
+// AJOUTER AU PANIER 
 if (isset($_GET['ajouter'])) {
     $nolivre = intval($_GET['ajouter']); // recupere id livre
 
@@ -40,7 +40,7 @@ if (isset($_GET['ajouter'])) {
     exit;
 }
 
-// --- SUPPRIMER DU PANIER ---
+
 if (isset($_GET['supprimer'])) {
     $nolivre = intval($_GET['supprimer']); // recupere id livre
     $_SESSION["panier"] = array_diff($_SESSION["panier"], [$nolivre]); // supprime du panier
@@ -48,10 +48,10 @@ if (isset($_GET['supprimer'])) {
     exit;
 }
 
-// --- VALIDATION PANIER ---
+//  VALIDATION PANIER 
 if (isset($_POST['valider'])) {
 
-    // 1) compter les emprunts deja en cours
+    //  compter les emprunts deja en cours
     $stmtCount = $pdo->prepare("
         SELECT COUNT(*) FROM emprunter 
         WHERE mel = :mel AND dateretour IS NULL

@@ -1,6 +1,6 @@
 <?php
-include "config.php"; // inclut config PDO
-include "entete.php"; // inclut header html
+include "config.php"; // inclut config.php
+include "entete.php"; // inclut entete.php
 
 // 3 derniers livres pour le carousel
 $stmt = $pdo->query("SELECT * FROM livre ORDER BY dateajout DESC LIMIT 3");

@@ -16,7 +16,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <body>
 
 <div class="container-fluid mt-3 text-center">
-    <h5>C’EST FERMÉ ! GRÂCE À BIBLIODRIVE, TU PEUX ACCÉDER AUX LIVRES</h5> 
+    <h5> GRÂCE À BIBLIODRIVE, TU PEUX ACCÉDER AUX LIVRES!!!</h5> 
 </div>
 <br>
 
@@ -59,7 +59,7 @@ if (session_status() === PHP_SESSION_NONE) {
             
             <form class="d-flex me-3" method="GET" action="recherche.php">
                 <input class="form-control me-2" type="text" name="q" placeholder="Rechercher un auteur">
-                <button class="btn btn-primary" type="submit">Search</button>
+                <button class="btn btn-primary" type="submit">RECHERCHE</button>
             </form>
 
             <?php if (isset($_SESSION['mel'])): ?> 
