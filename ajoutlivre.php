@@ -47,7 +47,7 @@ require "entete.php"; // inclut l'entete html
 <div class="container mt-4">
     <h2>Ajouter un livre</h2>
 
-    <p class="text-warning">⚠️ L'ajout de photo n'est plus disponible.</p>
+    <p class="text-warning"> L'ajout de photo n'est plus disponible.</p>
 
     <?php if (!empty($erreurs)): ?>
         <div class="alert alert-danger">
